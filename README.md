@@ -86,5 +86,5 @@ python3 scripts/redact_public.py
 
 ## 相关
 
-- 配套长文：<待填：知乎/掘金链接>
+- 配套长文（知乎专栏）：https://zhuanlan.zhihu.com/p/2087686416193032259
 - 开源判断模型：[Laya](https://github.com/NandhaKishorM/laya)（Apache 2.0）
