@@ -1,0 +1,85 @@
+{
+  "t1_arms": [
+    {
+      "arm": "A",
+      "judge": "Laya multilingual（本地 322M，中文 state）",
+      "source_file": "t1_results.json",
+      "n": 55,
+      "acc": 0.5818181818181818,
+      "deny_recall": 0.6154,
+      "deny_hit": 8,
+      "deny_n": 13,
+      "ask_recall": 0.0
+    },
+    {
+      "arm": "B",
+      "judge": "Laya english（本地）",
+      "source_file": "t1_results_en.json",
+      "n": 55,
+      "acc": 0.34545454545454546,
+      "deny_recall": 0.0,
+      "deny_hit": 0,
+      "deny_n": 13,
+      "ask_recall": 0.4
+    },
+    {
+      "arm": "D",
+      "judge": "Laya typed-decisions（官方微调检查点）",
+      "source_file": "t1_results_td.json",
+      "n": 55,
+      "acc": 0.2727272727272727,
+      "deny_recall": 0.0,
+      "deny_hit": 0,
+      "deny_n": 13,
+      "ask_recall": 1.0
+    },
+    {
+      "arm": "E",
+      "judge": "GLM-5.3-Flash（prompted 基线）",
+      "source_file": "e_results.json",
+      "n": 53,
+      "acc": 0.8679245283018868,
+      "deny_recall": 1.0,
+      "deny_hit": 11,
+      "deny_n": 11,
+      "ask_recall": 0.6
+    },
+    {
+      "arm": "E2",
+      "judge": "DeepSeek-V4-Flash（prompted 基线）",
+      "source_file": "dual_results.json",
+      "n": 55,
+      "acc": 0.9636363636363636,
+      "deny_recall": 1.0,
+      "deny_hit": 13,
+      "deny_n": 13,
+      "ask_recall": 0.9333
+    }
+  ],
+  "t2_result_verification": [
+    {
+      "judge": "Laya multilingual",
+      "n": 30,
+      "acc": 0.5,
+      "missed_failures": 15
+    },
+    {
+      "judge": "GLM-5.3-Flash",
+      "n": 29,
+      "acc": 0.9655172413793104,
+      "missed_failures": 0
+    },
+    {
+      "judge": "DeepSeek-V4-Flash",
+      "n": 30,
+      "acc": 1.0,
+      "missed_failures": 0
+    }
+  ],
+  "truth_provenance_counts": {
+    "双裁一致（规则修正）": 14,
+    "双裁确认": 32,
+    "仅规则（单边有效/未走双裁）": 3,
+    "用户仲裁": 6
+  }
+}
