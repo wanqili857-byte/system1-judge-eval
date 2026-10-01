@@ -53,9 +53,7 @@ kaggle/dataset/t5_train.jsonl (sha256 a9bc15e3da57…, 691 行)   → 训练
 models/t5_ft/model.safetensors (sha256 cff1f7be90ce…)
 ```
 
-校验：本仓库发布的 [`scripts/audit_t5_v2.py`](scripts/audit_t5_v2.py)
-会逐环比对上面的血缘链。注意它需要**私有**的原始数据与 `FREEZE.json` 才能真跑；
-公开件只够复核判据与数据形态，不能独立复算这组数字。
+校验：`audit_t5_v2.py`（公开件里在 `scripts/` 下，私有工作区里在 `synth/` 下）会逐环比对上面的血缘链。注意它需要**私有**的原始数据与 `FREEZE.json` 才能真跑；公开件只够复核判据与数据形态，不能独立复算这组数字。
 <!-- RESULTS:END -->
 
 完整分层结果、域外退化与**局限**见 [`REPORT.md`](REPORT.md) §5–§9。引用上面的数字前先读 §9。
