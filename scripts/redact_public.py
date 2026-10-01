@@ -3,7 +3,7 @@
 
 规则（可审计）：
   1. 求职类命令（含 jd/resume/apply/interview/offer 语义）→ **整条剔除**（命令本身就是求职活动，泛化后无意义）
-  2. 个人路径     ~/ayu/<repo>/...  →  ~/workspace/<repo>/...
+  2. 个人路径     ~/<user>/<repo>/...  →  ~/workspace/<repo>/...
   3. 私有项目名   ai-eval / swe-mini / swe-bench-runs / fictionforge / cc-switch / social-reply
                   / maoqiu / EcoEvolve → 泛化名（workspace / eval-harness / novel-agent / config-db ...）
   4. 公司名       DeepSeek / 字节 / bytedance / MiniMax / 智谱 / Kimi / 腾讯 / 阿里 / 淘天 → <company>
@@ -14,7 +14,8 @@
   dataset/t1_command_safety.jsonl   可发布题集
   dataset/REDACTION-REPORT.md       每条的处理结果（公开=可复现；剔除了多少条、为什么）
 """
-import json, os, re, collections
+import json
+import os, os, re, collections
 
 SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "t1_dataset.jsonl")
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "publish", "dataset")
@@ -24,8 +25,12 @@ DROP_PAT = re.compile(r"jd-file|resume|docs/apply|interview/|offer|招聘|面试
 # 凭证操作
 CRED_PAT = re.compile(r"KGAT_|sk-[A-Za-z0-9]|api_key|API_KEY|Authorization|token=", re.I)
 
-PATH_SUBS = [("~/ayu/ai-eval", "~/workspace"), ("/Users/ayu/ai-eval", "~/workspace"),
-             ("~/ayu/", "~/workspace/"), ("/Users/ayu/", "~/workspace/"),
+# 用户名**运行时推导**：这是公开仓，源码里留字面量等于把「跑它的人是谁」一起公开。
+_USER = os.path.basename(os.path.expanduser("~"))
+PATH_SUBS = [("~/%(u)s/ai-eval" % {"u": _USER}, "~/workspace"),
+             ("/Users/%(u)s/ai-eval" % {"u": _USER}, "~/workspace"),
+             ("~/%(u)s/" % {"u": _USER}, "~/workspace/"),
+             ("/Users/%(u)s/" % {"u": _USER}, "~/workspace/"),
              (r"/private/tmp/", "/tmp/"), ("~/.claude", "~/.agent-config"),
              ("docs/apply/", "docs/notes/"), ("docs/apply", "docs/notes"),
              ("docs/interview/", "docs/notes/"), ("qa-evaluator-methodology", "qa-notes"), (".claude", ".agent-config")]
@@ -68,9 +73,9 @@ def main():
             continue
         # 真实题：命令或输出里含求职/凭证语义 → 整条剔除（输出可能是求职正文，泛化后失去评测意义）
         if DROP_PAT.search(whole):
-            dropped.append((r["id"], "求职/招聘语义（命令或输出）", cmd[:70])); continue
+            dropped.append((r["id"], "求职/招聘语义（命令或输出）")); continue
         if CRED_PAT.search(whole):
-            dropped.append((r["id"], "凭证操作", cmd[:70])); continue
+            dropped.append((r["id"], "凭证操作")); continue
         new = scrub_record(r)
         keep.append((new, "真实会话 · 全字段语义脱敏"))
     os.makedirs(OUT, exist_ok=True)
@@ -84,11 +89,13 @@ def main():
          f"- 原始题集 55 条：真实会话 25 + 人工构造 30",
          f"- **可发布 {len(keep)} 条**：人工构造 {con_kept}（原样）+ 真实会话 {real_kept}（语义脱敏后）",
          f"- **剔除 {len(dropped)} 条**（命令本身即个人信息，泛化后失去评测意义）", "",
-         "## 剔除明细", "", "| id | 原因 | 命令（截断）|", "|---|---|---|"]
-    for i, why, c in dropped:
-        L.append(f"| {i} | {why} | `{c}` |")
+         "## 剔除明细", "", "| id | 剔除原因 |", "|---|---|"]
+    for i, why in dropped:
+        L.append(f"| {i} | {why} |")
+    L += ["", "> **刻意不引用被剔除命令的原文**：一份「脱敏报告」如果把脱敏前的原文抄进来，",
+          "> 等于把脱敏成果又泄回去。（初版逐条引用了原文，2026-10-01 修订。）"]
     L += ["", "## 脱敏规则（脚本 `scripts/redact_public.py`，可复跑核验）", "",
-          "- 个人路径 `~/ayu/<repo>` → `~/workspace/<repo>`；`~/.claude` → `~/.agent-config`",
+          "- 个人路径 `~/<user>/<repo>` → `~/workspace/<repo>`；`~/.claude` → `~/.agent-config`",
           "- 私有项目名 → 泛化名（workspace / eval-harness / novel-agent / config-db …）",
           "- 公司名（求职语境） → `<company>`",
           "- 凭证 `KGAT_*` / `sk-*` → `<REDACTED>`；**凭证操作类命令整条剔除**",
@@ -97,7 +104,7 @@ def main():
           "> 且敏感性检验（剔除 LLM 定义真值后 n=41）已证明排序不依赖个别条目。"]
     open(os.path.join(OUT, "REDACTION-REPORT.md"), "w", encoding="utf-8").write("\n".join(L) + "\n")
     print(f"可发布 {len(keep)} 条（构造 {con_kept} + 真实 {real_kept}）；剔除 {len(dropped)} 条")
-    for i, why, c in dropped:
+    for i, why in dropped:
         print(f"  剔 {i}: {why}")
 
 

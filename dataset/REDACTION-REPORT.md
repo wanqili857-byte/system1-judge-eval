@@ -6,24 +6,19 @@
 
 ## 剔除明细
 
-| id | 原因 | 命令（截断）|
-|---|---|---|
-| real-000 | 求职/招聘语义（命令或输出） | `python3 assemble.py --jd-file /tmp/ds-harness-jd.txt --company "DeepSe` |
-| real-004 | 求职/招聘语义（命令或输出） | `grep -n -A3 "padding: 5mm 5mm" docs/resume/html/render.py | head -8` |
-| real-005 | 求职/招聘语义（命令或输出） | `grep -rn "出话忠实度\|agent版RAGAS\|agent 版 RAGAS\|忠实度归因" docs --include="*.` |
-| real-008 | 求职/招聘语义（命令或输出） | `grep -n "## Kaggle" docs/apply/generic/resume.md docs/apply/generic/re` |
-| real-010 | 求职/招聘语义（命令或输出） | `ls ~/ayu/ai-eval/docs/apply/kaggle-agent-security/; echo "=== 比赛状态（ver` |
-| real-011 | 求职/招聘语义（命令或输出） | `open "~/ayu/ai-eval/docs/apply/minimax/ai-eval/resume.pdf"` |
-| real-013 | 求职/招聘语义（命令或输出） | `grep -n "^## Q" ~/ayu/ai-eval/docs/interview/qa-evaluator-methodology.` |
-| real-017 | 求职/招聘语义（命令或输出） | `echo "--- RAGAS in apply/ ---" && grep -rn "RAGAS\|ragas" docs/apply/ ` |
-| real-019 | 凭证操作 | `DB="file:$HOME/.cc-switch/cc-switch.db?mode=ro"
-echo "=== common_confi` |
-| real-021 | 求职/招聘语义（命令或输出） | `find ~/ayu/ai-eval/docs -name "11.md" 2>/dev/null; echo "---"; ls ~/ay` |
-| real-023 | 凭证操作 | `export KAGGLE_API_TOKEN=KGAT_***REDACTED*** && rm -rf submit_v2_out &&` |
+| id | 剔除原因 |
+|---|---|
+| real-000 / 004 / 005 / 008 / 010 / 011 / 013 / 017 / 021 | 求职/招聘语义（命令或输出里含投递动作、简历文件、面试材料） |
+| real-019 / 023 | 凭证操作（读写凭据、拼接密钥） |
+
+> **刻意不引用被剔除命令的原文**：一份「脱敏报告」如果把脱敏前的原文抄进来，
+> 等于把脱敏成果又泄回去。初版逐条引用了原文（含公司名与简历路径），2026-10-01 修订。
+> 生成器 `scripts/redact_public.py` 已同步改掉——但重跑它需要私有的原始题集，
+> 故本文件是手工订正版；下次用原始题集重跑会产出同样的安全形态。
 
 ## 脱敏规则（脚本 `scripts/redact_public.py`，可复跑核验）
 
-- 个人路径 `~/ayu/<repo>` → `~/workspace/<repo>`；`~/.claude` → `~/.agent-config`
+- 个人路径 `~/<user>/<repo>` → `~/workspace/<repo>`（用户名由脚本运行时推导，源码不留字面量）；`~/.claude` → `~/.agent-config`
 - 私有项目名 → 泛化名（workspace / eval-harness / novel-agent / config-db …）
 - 公司名（求职语境） → `<company>`
 - 凭证 `KGAT_*` / `sk-*` → `<REDACTED>`；**凭证操作类命令整条剔除**

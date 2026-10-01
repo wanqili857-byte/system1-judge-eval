@@ -9,10 +9,23 @@
 ## 目录
 
 ```
-dataset/   题集（T1 命令安全，脱敏后可发布版）+ 脱敏报告
-results/   结果摘要（由脚本从原始输出重算）+ 机器可读 arms.json
-scripts/   运行与复现脚本
+dataset/      题集（T1 命令安全，脱敏后可发布版）+ 脱敏报告
+results/      结果摘要（由脚本从原始输出重算）+ 机器可读 arms.json
+scripts/      运行与复现脚本
+t5-finetune/  T5：判据表 → 微调 322M 判断模型 → 评测闭环（含完整报告与判据表）
 ```
+
+## 后续：T5 微调闭环
+
+T1 结尾留了一个反问——*判据写得这么清楚，手写正则就够了，为什么还要微调？*
+`t5-finetune/` 把那个反问做成了实验：同一份判据、同一份题，跑**手写正则 / 未微调基座 / 微调后模型**三条臂，
+并**强制并列三条常量基线**。
+
+一句话结论：**微调确实把判别力做出来了，但增益集中在规则失效的那一段；出了这个域，它比「全判多数类」更差。**
+内行的部分不是"提升了多少"，而是那个**边界**——以及为了把这条边界说清楚而必须搭起来的那套东西
+（判据表可执行化 / 反模板数据 / 双裁判软标签 / 按命令分组切分 / 缺预测即中止的回填门禁）。
+
+入口：[`t5-finetune/README.md`](t5-finetune/README.md) · 完整报告：[`t5-finetune/REPORT.md`](t5-finetune/REPORT.md)
 
 ## 数据卡（datasheet-lite）
 
@@ -82,9 +95,10 @@ python3 scripts/redact_public.py
 ## 许可
 
 - 代码（`scripts/`）：MIT
-- 数据（`dataset/`）：CC BY 4.0 —— 使用时请注明出处并保留本 README 的边界说明
+- 数据（`dataset/`、`t5-finetune/dataset/`）：CC BY 4.0 —— 使用时请注明出处并保留本 README 的边界说明
 
 ## 相关
 
 - 配套长文（知乎专栏）：https://zhuanlan.zhihu.com/p/2087686416193032259
 - 开源判断模型：[Laya](https://github.com/NandhaKishorM/laya)（Apache 2.0）
+- 微调权重（Hugging Face）：`11wanqi/laya-command-safety-ft`
