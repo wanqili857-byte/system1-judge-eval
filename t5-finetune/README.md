@@ -16,7 +16,7 @@ T1 留下一句反问：**判据写得这么清楚，手写正则就够了，为
 ```
 REPORT.md                     完整实验报告（唯一数字源：§5 的自动生成区块）
 rubric-command-safety.md      判据表：三轴 × 17 规则，逐条标锚点数
-model-card.md                 模型卡（HF 版同文，含 YAML frontmatter）
+model-card.md                 模型卡（HF 版同文含 YAML frontmatter，链接指回本仓）
 dataset/t5_synth_public.jsonl 公开合成数据集 298 条
 scripts/                      判据 / 生成 / 组装 / 评测 / 审计 脚本
 ```
@@ -39,7 +39,8 @@ scripts/                      判据 / 生成 / 组装 / 评测 / 审计 脚本
 
 - **原始训练/留出 jsonl 与逐条双裁判判定记录**——一律不公开（含未脱敏的真实会话内容）。
 - **真实会话臂**——其真值依赖未公开的对话上下文，公开版只有合成臂可复核。
-- **微调权重**——单独发布在 Hugging Face（链接见仓库首页）。
+- **微调权重**——单独发布在 Hugging Face：
+  [11wanqi/laya-command-safety-ft](https://huggingface.co/11wanqi/laya-command-safety-ft)（初版发布为 private，见 [`model-card.md`](model-card.md)）。
 
 ## 复现
 

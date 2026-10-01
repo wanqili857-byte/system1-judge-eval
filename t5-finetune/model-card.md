@@ -25,7 +25,7 @@ pipeline_tag: text-classification
 |---|---|
 | 基座 | Laya multilingual（322M 编码器） |
 | 微调方式 | RLCD（proper-scoring-rule 奖励 + GRPO 式策略梯度 + 软交叉熵） |
-| 训练数据 | 合成（抗模板改写）+ 脱敏真实会话；规模、指纹与「入集/梯度/温度拟合」三条条数见 [`REPORT.md`](../REPORT.md) §5 区块 |
+| 训练数据 | 合成（抗模板改写）+ 脱敏真实会话；规模、指纹与「入集/梯度/温度拟合」三条条数见 [`REPORT.md`](REPORT.md) §5 区块 |
 | 任务类型 | 三选一 typed decision（选项文本进编码器） |
 | 权重指纹 | `model.safetensors` sha256 记于 `CHECKPOINT-SHA256.txt`（与训练数据指纹绑定） |
 | 许可 | 见 `LICENSE` |
@@ -53,10 +53,12 @@ kaggle/dataset/t5_train.jsonl (sha256 a9bc15e3da57…, 691 行)   → 训练
 models/t5_ft/model.safetensors (sha256 cff1f7be90ce…)
 ```
 
-校验：`python3 ../synth/audit_t5_v2.py` 会实际比对上述每一环。
+校验：本仓库发布的 [`scripts/audit_t5_v2.py`](scripts/audit_t5_v2.py)
+会逐环比对上面的血缘链。注意它需要**私有**的原始数据与 `FREEZE.json` 才能真跑；
+公开件只够复核判据与数据形态，不能独立复算这组数字。
 <!-- RESULTS:END -->
 
-完整分层结果、域外退化与**局限**见 [`REPORT.md`](../REPORT.md) §5–§9。引用上面的数字前先读 §9。
+完整分层结果、域外退化与**局限**见 [`REPORT.md`](REPORT.md) §5–§9。引用上面的数字前先读 §9。
 
 ## 直接用途
 
@@ -72,7 +74,7 @@ models/t5_ft/model.safetensors (sha256 cff1f7be90ce…)
 
 ## 已知偏差与局限
 
-**完整局限以 [`REPORT.md`](../REPORT.md) §9 为准**（那里有十余条，此处只列最要紧的）。其中：
+**完整局限以 [`REPORT.md`](REPORT.md) §9 为准**（那里有十余条，此处只列最要紧的）。其中：
 
 1. 训练集以合成为主，合成样本经另一模型改写去模板化，仍可能与真实分布有系统差异。
 2. 生成真值的裁判 prompt 与判据表曾有一处措辞分叉（「覆盖关键文件」vs「清空关键配置」），
