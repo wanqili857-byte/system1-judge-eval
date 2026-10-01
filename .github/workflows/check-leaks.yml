@@ -1,0 +1,37 @@
+name: check-leaks
+
+# 这个仓库是公开的，里面放的是选题集与结果。公开仓的共同风险是
+# 「脱敏做过了」被当成既成事实 —— 而它只在做的那一次成立。
+# 这里把 quorum 的泄漏自检挂成每次 push 都跑的关卡。
+#
+# 这条门禁有实证：第一次跑就抓到两处**已经公开了一个月**的泄漏
+#   - dataset/REDACTION-REPORT.md 把被剔除命令的原文又引用了一遍
+#   - scripts/redact_public.py 的替换表里写着字面用户名
+# 两处都已修。见 dataset/REDACTION-REPORT.md 的修订说明。
+
+on: [push, pull_request]
+
+jobs:
+  leaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # 钉到 commit，不跟 main：门禁的结果不该取决于「main 今天长什么样」。
+      # 升级 quorum 时改这个 sha，改完这条 CI 会告诉你新版本会不会让本仓变红。
+      - name: 安装 quorum（钉版本）
+        run: pip install "quorum-review @ git+https://github.com/wanqili857-byte/quorum@7cbee0d7aee85cac1a42b77a0715a247b349e5ba"
+
+      # 自检：每条规则能不能抓到自己种的样本。
+      # 「检查能不能失败」的检查，自己必须能失败。
+      - name: 规则自检
+        run: quorum check-leaks --self-test
+
+      # 退出码只看 fail 档（确定性形状：凭证 / 私钥 / 邮箱 / 路径里的本机用户名）。
+      # warn 档（`~/<任意词>/` 这类启发式）不影响退出码 —— 所以**必须读输出正文**，
+      # `rc=0` 不等于「干净」。本仓的 `~/workspace/` 占位符就落在 warn 档。
+      - name: 泄漏扫描
+        run: quorum check-leaks .
